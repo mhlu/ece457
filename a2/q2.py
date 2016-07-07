@@ -1,13 +1,16 @@
 import random
 import copy
+import sys
 
 class Game:
-    def __init__(self):
+    def __init__(self, depth):
         # Initialize 4x4 board with 10 stones for each player
         self.board = [[() for i in range(4)] for j in range(4)]
         self.board[3][0] = (10, 'b')
         self.board[3][3] = (10, 'w')
         self.turn = 'b'
+        self.depth = depth
+        self.visited_nodes = 0
 
     def printState(self):
         print '\n' + '-' * 25
@@ -36,6 +39,9 @@ class Game:
     def winner(self):
         # If last turn was player 1, then player 2 is winner (vice-versa)
         return "Player 1" if self.turn == 'w' else "Player 2"
+
+    def visited(self):
+        return self.visited_nodes
 
     # Checks if current player has any moves
     def _valid_moves(self, board=None, player=None):
@@ -68,10 +74,11 @@ class Game:
 
     def _minimax(self):
         # Player 1 (black) is the max and Player 2 is the min
-        best = self._do_minimax(self.board, self.turn, 3)
+        best = self._do_minimax(self.board, self.turn, self.depth, None, None)
         self.board = best[1]
 
-    def _do_minimax(self, board, player, depth):
+    def _do_minimax(self, board, player, depth, a, b):
+        self.visited_nodes += 1
         if depth == 0 or not self._valid_moves(board, player):
             return (self._evaluate(board), board)
 
@@ -92,7 +99,10 @@ class Game:
                     if self._valid_next(pos[0] + direction[0], pos[1] + direction[1], board, player): 
                         new_board = copy.deepcopy(board)
                         self._move(pos[0], pos[1], direction, new_board, player)
-                        value = self._do_minimax(new_board, 'w', depth - 1)
+                        value = self._do_minimax(new_board, 'w', depth - 1, a, b)
+                        a = max(a, value[0]) if a is not None else value[0]
+                        if a and b and b <= a:
+                            break
                         if bestValue is None or value[0] > bestValue:
                             bestValue, bestBoard = value[0], new_board
             return (bestValue, bestBoard)
@@ -105,7 +115,10 @@ class Game:
                     if self._valid_next(pos[0] + direction[0], pos[1] + direction[1], board, player): 
                         new_board = copy.deepcopy(board)
                         self._move(pos[0], pos[1], direction, new_board, player)
-                        value = self._do_minimax(new_board, 'b', depth - 1)
+                        value = self._do_minimax(new_board, 'b', depth - 1, a, b)
+                        b = min(b, value[0]) if b is not None else value[0]
+                        if a and b and b <= a:
+                            break
                         if bestValue is None or value[0] < bestValue:
                             bestValue, bestBoard = value[0], new_board
             return (bestValue, bestBoard)
@@ -119,13 +132,13 @@ class Game:
                 if len(board[i][j]) and board[i][j][1] == 'b':
                     score += 1
                     if self._movable(i, j, board, 'b'):
-                        score += 1#board[i][j][0]
+                        score += 1
         for i in range(4):
             for j in range(4):
                 if len(board[i][j]) and board[i][j][1] == 'w':
                     score -= 1
                     if self._movable(i, j, board, 'w'):
-                        score -= 1 #board[i][j][0]
+                        score -= 1
         return score
 
     def _random(self):
@@ -185,11 +198,16 @@ class Game:
                 stones -= i
 
 if __name__ == "__main__":
-    game = Game()
+    iterations = 0
+    game = Game(int(sys.argv[1]))
     game.printState()
 
     while not game.over():
+        iterations += 1
         game.nextMove()
         game.printState()
 
-    print game.winner()
+    print game.winner(), "wins the game"
+    print "Iterations:", iterations
+    print "Nodes Visited:", game.visited()
+    print "Depth:", sys.argv[1]
