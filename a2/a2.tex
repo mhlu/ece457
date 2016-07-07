@@ -1,0 +1,59 @@
+\documentclass[12pt]{article}
+
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[normalem]{ulem}
+\usepackage[pdftitle={ECE 457A Assignment 2},%
+pdfsubject={University of Waterloo, ECE 457A},%
+pdfauthor={Jason Shao, Minghao Lu}]{hyperref}
+
+\title{ECE 457A Assignment 2}
+\author{Jason Shao, Minghao Lu}
+\date{July 6, 2016}
+
+\begin{document}
+\maketitle
+\newpage
+\renewcommand{\thesubsection}{Problem \arabic{subsection}}
+
+
+\def\question#1{\item[\bf #1.]}
+\def\part#1{\item[\bf #1)]}
+\newcommand{\pc}[1]{\mbox{\textbf{#1}}} % pseudocode
+
+\begin{enumerate}
+    \item 
+    \item
+    \item
+    \item
+    \begin{enumerate}[label=(\alph*)]
+        \item
+            \begin{enumerate}[label=(\roman*)]
+                \item Sol = $[R_1,R_2,...,Rm]$ where $R_i$ is the order list of cities
+                    (represented by the number of the city) visited by vehicle i,
+                    $\cup^{m}_{i=1}R_i=\{1,\dots,c\}$, and $i \neq j \rightarrow R_i \cap R_j$
+                \item We'll define two neighbourhood operations.
+                    \begin{enumerate}
+                        \item Take a city from some route $R_i \in Sol$, and swap it with another city 
+                            from some route $R_j \in Sol$
+                        \item Take a city from some route $R_i \in Sol$, and insert it in some position
+                            of some route $R_j \in Sol$
+                    \end{enumerate}
+                    The neighbourhood of a solution Sol are all the solutions that can be reached
+                    from Sol with a single application of one of the above two neighbourhood operations.
+                \item Let $n_i$ be the length of $R_i$, we can define the $cost(R_i)$ to be
+                $Depot[R_i[0]] + D[R_i[0], R_i[1]] + D[R_i[1],R_i[2]] + \dots + D[R_i[n_i-1],R_i[n_i]]+ Depot[R_i[n_i]]$
+                A suitable object function of a solution is: $\sum^{m}_{i=1}cost(R_i)$.
+            \end{enumerate}
+        \item
+
+    \end{enumerate}
+
+\end{enumerate}
+\end{document}
