@@ -4,7 +4,7 @@ import itertools as it
 from random import randrange
 
 # lower is better
-def getEval(F,D,p,freqFactor=0):
+def getEval(F,D,p,freq=None,freqFactor=0):
     total = 0
     for i in range(F.shape[0]-1):
         for j in range(i+1,F.shape[0]):
@@ -47,7 +47,7 @@ def ts(F, D, p, numIter, tabuLen, dynDurr=0, aspType=0, neighRatio=1, freqFactor
                 newPerm = p.copy()
                 newPerm[i], newPerm[j] = newPerm[j], newPerm[i]
 
-                newEval = getEval(F,D,newPerm) if not freqFactor == 0 else getEval(F,D,newPerm,freqFactor)
+                newEval = getEval(F,D,newPerm) if freqFactor == 0 else getEval(F, D,newPerm,freq, freqFactor)
 
                 if T[newPerm[i], i] or T[newPerm[j],j]:
                     if aspType != 0 and newEval < bestAspEval:
@@ -91,7 +91,10 @@ def ts(F, D, p, numIter, tabuLen, dynDurr=0, aspType=0, neighRatio=1, freqFactor
         # print(gBestEval)
         # print(T, p, currEval)
     print('final eval: '+str(gBestEval))
-    finalP = p.tolist()
+    for i in range(len(initialP)):
+        initialP[i] += 1
+    for i in range(len(gBestPerm)):
+        gBestPerm[i] += 1
     print('initial permuatation: \t'+str(initialP))
     print('final permuatation: \t'+str(gBestPerm.tolist()))
     print('\n')
