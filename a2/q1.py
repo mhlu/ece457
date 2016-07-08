@@ -24,10 +24,10 @@ def reconstructPath(parent, start, goal):
 
 
 def bfs(grid, start, goal):
-    if start == goal:
-        return [goal]
-    parent = {}
     seen = set([start])
+    if start == goal:
+        return [goal], len(seen)
+    parent = {}
     queue = deque([start])
     while True:
         if not queue:
@@ -38,10 +38,10 @@ def bfs(grid, start, goal):
             ni, nj = i+di, j+dj
             if not isFree(grid, ni, nj, seen):
                 continue
+            seen.add((ni, nj))
             parent[(ni,nj)] = i, j
             if (ni, nj) == goal:
-                return reconstructPath(parent, start, goal)
-            seen.add((ni, nj))
+                return reconstructPath(parent, start, goal), len(seen)
             queue.append((ni, nj))
 
 
@@ -62,7 +62,7 @@ def astar(grid, start, goal):
     while openSet:
         i, j = min(openSet, key=lambda x: futureScore[x])
         if (i, j) == goal:
-            return reconstructPath(parent, start, (i,j))
+            return reconstructPath(parent, start, (i,j)), len(openSet), len(closedSet)
 
         openSet.remove((i, j))
         closedSet.add((i, j))
@@ -89,7 +89,7 @@ def dfs(grid, start, goal):
     path = [start]
     found =  dfs_helper(grid, start, goal, seen, path)
     if found:
-        return path
+        return path, len(seen)
     raise ValueError('could not find goal')
 
 def dfs_helper(grid, curr, goal, seen, path):
@@ -97,7 +97,7 @@ def dfs_helper(grid, curr, goal, seen, path):
         return True
 
     i, j = curr
-    for di, dj in ((-1,0), (1,0), (0,-1), (0,1)):
+    for di, dj in ((1,0), (0,1), (0,-1), (-1,0)):
         ni, nj = i+di, j+dj
         if not isFree(grid, ni, nj, seen):
             continue
@@ -116,7 +116,7 @@ def dfs_helper(grid, curr, goal, seen, path):
 
 if __name__ == "__main__":
     grid = []
-    with open('figure1.txt') as fin:
+    with open('resource/figure1.txt') as fin:
         for line in fin:
             grid.append(line.strip())
     grid.reverse()
@@ -133,12 +133,31 @@ if __name__ == "__main__":
                 goal2 = (i,j)
                 continue
 
-    print(astar(grid, start, goal1))
-    print(bfs(grid, start, goal1))
-    print(dfs(grid, start, goal1))
-    assert len(astar(grid, start, goal1)) == len(bfs(grid, start, goal1))
-    assert len(astar(grid, start, goal2)) == len(bfs(grid, start, goal2))
+    def test(start, end, startText=None, endText=None):
+        print('*******************************************')
+        print('Starting from: {0}, Ending at: {1}'.format(startText or start, endText or end))
+        print('*******************************************')
+        aPath, openSize, closedSize = astar(grid, start, end)
+        print('------ atar output ------------------')
+        print('path: '+str(aPath))
+        print('path cost: '+ str(len(aPath)))
+        print('open set size :'+str(openSize))
+        print('closed set size :'+str( closedSize))
+        print('\n')
+        bPath, bSize = bfs(grid, start, end)
+        print('------ bfs output ------------------')
+        print('path :'+str( bPath))
+        print('path cost: '+str( len(bPath)))
+        print('expanded : '+str( bSize))
+        print('\n')
+        dPath, dSize = dfs(grid, start, end)
+        print('------ dfs output ------------------')
+        print('path :'+str( dPath))
+        print('path cost: '+str( len(dPath)))
+        print('expanded : '+str( dSize))
+        print('\n')
+        assert len(aPath) == len(bPath)
 
-
-
-
+    test((0,0),(24,24))
+    test(start,goal1, 'S', 'E1')
+    test(start,goal2, 'S', 'E2')
