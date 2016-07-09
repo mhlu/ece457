@@ -6,7 +6,7 @@ class Game:
     def __init__(self, depth):
         # Initialize 4x4 board with 10 stones for each player
         self.board = [[() for i in range(4)] for j in range(4)]
-        self.board[3][0] = (10, 'b')
+        self.board[0][0] = (10, 'b')
         self.board[3][3] = (10, 'w')
         self.turn = 'b'
         self.depth = depth
