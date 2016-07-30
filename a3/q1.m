@@ -1,5 +1,5 @@
 POPULATION_SIZE = 50;
-GENERATIONS = 150;
+GENERATIONS = 200;
 CROSSOVER_PROB = 0.6;
 MUTATION_PROB = 0.25;
 
@@ -20,10 +20,14 @@ for generation = 1:GENERATIONS
     parents = zeros(POPULATION_SIZE, 3);
     offspring = zeros(POPULATION_SIZE, 3);
 
-    % Select Parents using FPS with sum of measures as fitness function
+    % Select Parents using FPS with weighted sum of measures as fitness function
     fitness_values = zeros(POPULATION_SIZE, 1);
     for i = 1:POPULATION_SIZE
-        fitness_values(i) = -sum(perffcn(transpose(population(i,:))));
+        [ISE, t_r, t_s, M_p] = perffcn(transpose(population(i,:)));
+        fitness_values(i) = -(0.5*ISE + t_r + t_s + M_p);
+        if isnan(fitness_values(i))
+            fitness_values(i) = -1000;
+        end
     end
     total_fitness = sum(fitness_values);
     shift_value = -min(fitness_values) + 1;
